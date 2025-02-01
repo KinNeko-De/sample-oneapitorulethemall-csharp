@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package kindatta.ecommerce.product_offer.v1;
+
+// Represents a seller in the product offer domain.
+message Seller {
+  // Unique identifier for the seller.
+  // Universally Unique Identifier (https://www.rfc-editor.org/rfc/rfc4122)
+  // Example: 550e8400-e29b-11d4-a716-446655440000
+  string id = 1;
+  // Human readable identifier for the seller.
+  // Also a login name for the seller.
+  string email = 2;
+}

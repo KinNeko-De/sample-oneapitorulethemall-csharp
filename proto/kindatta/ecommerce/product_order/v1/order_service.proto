@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package kindatta.ecommerce.product_order.v1;
+
+import "kindatta/ecommerce/product_order/v1/product.proto";
+
+// The OrderProductService is responsible for handling buyers request to order products.
+// The service is calle from the user interface.
+service OrderProductService {
+  // Orderes a list of products for a buyer.
+  rpc OrderProduct(OrderProductRequest) returns (OrderProductResponse);
+}
+
+// request message for ordering a product.
+message OrderProductRequest {
+  // Unique identifier for the request.
+  // Universally Unique Identifier (https://www.rfc-editor.org/rfc/rfc4122)
+  // Example: 550e8400-e29b-11d4-a716-446655440000
+  // The request_id is used to track the request and ensure that it is processed only once.
+  string request_id = 1;
+  // Unique identifier for the buyer.
+  // Universally Unique Identifier (https://www.rfc-editor.org/rfc/rfc4122)
+  // Example: 550e8400-e29b-11d4-a716-446655440000
+  string buyer_id = 2;
+  // List of products to be ordered.
+  repeated kindatta.ecommerce.product_order.v1.Product products = 3;
+}
+
+// Empty response message for ordering a product.
+message OrderProductResponse {}

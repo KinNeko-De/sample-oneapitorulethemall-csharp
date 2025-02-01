@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package kindatta.ecommerce.product_offer.v1;
+
+// Represents a product in the product offer domain.
+message Product {
+  // Unique identifier for the product offered.
+  // Universally Unique Identifier (https://www.rfc-editor.org/rfc/rfc4122)
+  // Example: 550e8400-e29b-11d4-a716-446655440000
+  string id = 1;
+  // A short name for the product.
+  string name = 2;
+  // A full description of the product. Can contain formated text.
+  string description = 3;
+}

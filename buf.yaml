@@ -1,0 +1,11 @@
+version: v2
+modules:
+  - path: proto
+    includes:
+      - proto/kindatta/ecommerce/product_offer
+  - path: proto
+    includes:
+      - proto/kindatta/ecommerce/product_order
+lint:
+  use:
+    - STANDARD
