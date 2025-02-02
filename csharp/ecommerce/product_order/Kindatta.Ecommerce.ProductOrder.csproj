@@ -15,4 +15,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Protobuf Include="../../../proto/kindatta/ecommerce/product_order/**/*.proto" ProtoRoot="../../../proto">
+      <Link>kindatta/ecommerce/product_order/%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Protobuf>
+  </ItemGroup>
+
 </Project>
