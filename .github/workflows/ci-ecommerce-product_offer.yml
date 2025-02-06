@@ -1,0 +1,19 @@
+on:
+  push:
+    paths:
+      - '.github/workflows/ci-ecommerce-product_offer.yml'
+      - '.github/workflows/ci.yml'
+      - 'proto/kindatta/ecommerce/product_offer/**'
+      - 'csharp/ecommerce/product_offer/**'
+
+concurrency: ci-api-ecommerce-product_offer-${{ github.ref }}
+
+name: ci-api-ecommerce-product_offer
+
+jobs:
+    ci-api:
+      uses: ./.github/workflows/ci.yml
+      with:
+        project: ecommerce-product_offer
+        csharp_project: csharp/ecommerce/product_offer/Kindatta.Ecommerce.ProductOffer.csproj
+      secrets: inherit

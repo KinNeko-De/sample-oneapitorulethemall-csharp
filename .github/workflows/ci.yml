@@ -1,0 +1,26 @@
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+      csharp_project:
+        required: true
+        type: string
+
+jobs:
+  ci:
+    name: "${{ inputs.project }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # csharp
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+      - name: Restore dependencies for csharp
+        run: dotnet restore ${{ inputs.csharp_project }} --configfile csharp/nuget.config
+      - name: Build .NET
+        run: |
+         dotnet build ${{ inputs.csharp_project }} --no-restore -c Release
