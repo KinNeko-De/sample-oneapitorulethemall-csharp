@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <Authors>Kindatta</Authors>
+    <Description>Api contract for the Kindatta Marketplace for sellers.</Description>
+    <PackageTags>kindatta marketplace product offer seller</PackageTags>
+    <RepositoryUrl>https://github.com/KinNeko-De/sample-oneapitorulethemall-csharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
