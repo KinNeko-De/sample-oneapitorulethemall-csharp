@@ -24,3 +24,6 @@ jobs:
       - name: Build .NET
         run: |
          dotnet build ${{ inputs.csharp_project }} --no-restore -c Release
+      - name: Pack .NET
+        run: |
+          dotnet pack ${{ inputs.csharp_project }} --no-restore --no-build -c Release
