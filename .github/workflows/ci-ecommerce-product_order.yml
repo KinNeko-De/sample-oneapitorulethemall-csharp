@@ -15,5 +15,6 @@ jobs:
       uses: ./.github/workflows/ci.yml
       with:
         project: ecommerce-product_order
+        major_minor_patch: 0.0.1
         csharp_project: csharp/ecommerce/product_order/Kindatta.Ecommerce.ProductOrder.csproj
       secrets: inherit
