@@ -13,6 +13,8 @@ name: ci-api-ecommerce-product_order
 jobs:
     ci-api:
       uses: ./.github/workflows/ci.yml
+      permissions:
+        contents: write
       with:
         project: ecommerce-product_order
         major_minor_patch: 0.0.1
