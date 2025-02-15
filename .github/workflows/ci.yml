@@ -53,6 +53,16 @@ jobs:
           echo 'SEMANTIC_VERSION: ' ${SEMANTIC_VERSION}
           echo "semantic_version=${SEMANTIC_VERSION}" >> $GITHUB_OUTPUT
           echo "major_minor_patch=${MAJOR_MINOR_PATCH}" >> $GITHUB_OUTPUT
+      - name: "Version upgraded?"
+        id: version_safeguiard
+        run: |
+          git fetch --prune --unshallow --tags > /dev/null 2>&1
+          last_main_version=$(git tag --list '${{ inputs.api_identifier }}/v[0-9]*\.[0-9]*\.[0-9]*' | grep -Pv "${{ inputs.api_identifier }}/v[0-9]*\.[0-9]*\.[0-9]*-" | sort -V | tail -n 1)
+          echo "Compare last main version: $last_main_version with current version: ${{ inputs.api_identifier }}/v${{ steps.semantic_version.outputs.major_minor_patch }}"
+          if [[ $(echo -e "${{ inputs.api_identifier }}/v${{ steps.semantic_version.outputs.major_minor_patch }}\n$last_main_version" | sort -V | head -n 1) == "${{ inputs.api_identifier}}/v${{ steps.semantic_version.outputs.major_minor_patch }}" ]]; then
+            echo "Please upgrade the version number for ${{ inputs.api_identifier }} to a higher value than $last_main_version"
+            exit 1
+          fi
       # csharp
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
