@@ -16,5 +16,6 @@ jobs:
       with:
         project: ecommerce-product_offer
         major_minor_patch: 0.0.1
+        api_identifier: productoffer
         csharp_project: csharp/ecommerce/product_offer/Kindatta.Ecommerce.ProductOffer.csproj
       secrets: inherit

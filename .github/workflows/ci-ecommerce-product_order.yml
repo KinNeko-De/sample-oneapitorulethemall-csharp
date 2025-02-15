@@ -16,5 +16,6 @@ jobs:
       with:
         project: ecommerce-product_order
         major_minor_patch: 0.0.1
+        api_identifier: productorder
         csharp_project: csharp/ecommerce/product_order/Kindatta.Ecommerce.ProductOrder.csproj
       secrets: inherit
