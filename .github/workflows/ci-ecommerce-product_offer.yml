@@ -15,6 +15,7 @@ jobs:
       uses: ./.github/workflows/ci.yml
       permissions:
         contents: write
+        packages: write
       with:
         project: ecommerce-product_offer
         major_minor_patch: 0.0.1
