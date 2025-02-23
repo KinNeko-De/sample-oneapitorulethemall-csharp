@@ -1,0 +1,24 @@
+on:
+  push:
+    paths:
+      - '.github/workflows/ci-ecommerce-product_order.yml'
+      - '.github/workflows/ci.yml'
+      - 'proto/kindatta/ecommerce/product_order/**'
+      - 'csharp/ecommerce/product_order/**'
+
+concurrency: ci-api-ecommerce-product_order-${{ github.ref }}
+
+name: ci-api-ecommerce-product_order
+
+jobs:
+    ci-api:
+      uses: ./.github/workflows/ci.yml
+      permissions:
+        contents: write
+        packages: write
+      with:
+        project: ecommerce-product_order
+        major_minor_patch: 0.0.1
+        api_identifier: productorder
+        csharp_project: csharp/ecommerce/product_order/Kindatta.Ecommerce.ProductOrder.csproj
+      secrets: inherit

@@ -1,0 +1,101 @@
+on:
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+      major_minor_patch:
+        required: true
+        type: string
+      api_identifier:
+        required: true
+        type: string
+      csharp_project:
+        required: true
+        type: string
+
+jobs:
+  ci:
+    name: "${{ inputs.project }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version suffix
+        id: version_suffix
+        run: |
+          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            echo 'for pull request pipeline'
+            USE=true
+            SUFFIX=${GITHUB_HEAD_REF##*/}.${{github.run_number}}
+          else
+            if [[ ${{ github.ref }} == "refs/heads/${{ github.event.repository.default_branch }}" ]]; then
+              echo 'for default branch pipeline'
+              USE=false
+              SUFFIX=''
+            else
+              echo 'for feature branch pipeline'
+              USE=true
+              SUFFIX=${GITHUB_REF##*/}.${{github.run_number}}
+            fi
+          fi
+          echo 'use_version_suffix' $USE
+          echo 'version_suffix: ' $SUFFIX
+          echo "use_version_suffix=$USE" >> $GITHUB_OUTPUT
+          echo "version_suffix=$SUFFIX" >> $GITHUB_OUTPUT
+      - name : Semantic version
+        id: semantic_version
+        run: |
+          MAJOR_MINOR_PATCH="${{ inputs.major_minor_patch }}"
+          echo 'MAJOR_MINOR_PATCH: ' ${MAJOR_MINOR_PATCH}
+          SEMANTIC_VERSION="${MAJOR_MINOR_PATCH}-${{ steps.version_suffix.outputs.version_suffix }}"
+          echo 'SEMANTIC_VERSION: ' ${SEMANTIC_VERSION}
+          echo "semantic_version=${SEMANTIC_VERSION}" >> $GITHUB_OUTPUT
+          echo "major_minor_patch=${MAJOR_MINOR_PATCH}" >> $GITHUB_OUTPUT
+      - name: "Version upgraded?"
+        id: version_safeguiard
+        run: |
+          git fetch --prune --unshallow --tags > /dev/null 2>&1
+          last_main_version=$(git tag --list '${{ inputs.api_identifier }}/v[0-9]*\.[0-9]*\.[0-9]*' | grep -Pv "${{ inputs.api_identifier }}/v[0-9]*\.[0-9]*\.[0-9]*-" | sort -V | tail -n 1)
+          echo "Compare last main version: $last_main_version with current version: ${{ inputs.api_identifier }}/v${{ steps.semantic_version.outputs.major_minor_patch }}"
+          if [[ $(echo -e "${{ inputs.api_identifier }}/v${{ steps.semantic_version.outputs.major_minor_patch }}\n$last_main_version" | sort -V | head -n 1) == "${{ inputs.api_identifier}}/v${{ steps.semantic_version.outputs.major_minor_patch }}" ]]; then
+            echo "Please upgrade the version number for ${{ inputs.api_identifier }} to a higher value than $last_main_version"
+            exit 1
+          fi
+      # csharp
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+      - name: Set dotnet parameter
+        id: dotnet
+        run: |
+          ARGS=()
+          ARGS+=("-p:VersionPrefix=${{ steps.semantic_version.outputs.major_minor_patch }}")
+          if [[ "${{ steps.version_suffix.outputs.use_version_suffix }}" == 'true' ]]; then
+            ARGS+=('--version-suffix' "${{ steps.version_suffix.outputs.version_suffix }}")
+          fi
+          echo 'parameters' ${ARGS[@]}
+          echo "parameters=${ARGS[@]}" >> $GITHUB_OUTPUT
+      - name: Restore dependencies for csharp
+        run: dotnet restore ${{ inputs.csharp_project }} --configfile csharp/nuget.config
+      - name: Build .NET
+        run: |
+         dotnet build ${{ inputs.csharp_project }} --no-restore -c Release ${{ steps.dotnet.outputs.parameters }}
+      - name: Pack .NET
+        run: |
+          dotnet pack ${{ inputs.csharp_project }} --no-restore --no-build -c Release ${{ steps.dotnet.outputs.parameters }}
+      - name: Publish nuget for .NET
+        run: dotnet nuget push **\**.nupkg --source "https://nuget.pkg.github.com/${{ github.repository_owner }}" --api-key ${{ secrets.GITHUB_TOKEN }}
+      - name: Create semantic versioning git tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ inputs.api_identifier }}/v${{ steps.semantic_version.outputs.semantic_version }}",
+              sha: context.sha
+            })
